@@ -1,19 +1,19 @@
 node {
-    // Herramienta Maven (asegúrate que esté configurada en Jenkins → Global Tool Configuration)
+    // Herramienta Maven
     def mvnHome = tool 'maven-3.8.5'
  
-    // Nombre del repositorio Docker privado (Nexus local)
+    // Configuración de la imagen Docker
     def dockerRepoUrl = "localhost:8083"
     def dockerImageName = "hello-world-java"
     def dockerImageTag = "${dockerRepoUrl}/${dockerImageName}:${env.BUILD_NUMBER}"
+ 
     def dockerImage
  
     stage('Clone Repo') {
-git 'https://github.com/dstar55/docker-hello-world-spring-boot.git'
+	git 'https://github.com/stevenjose/docker-hello-world-spring-boot.git'
     }
  
     stage('Build Project') {
-        // Compila el proyecto usando Maven
         sh "${mvnHome}/bin/mvn -Dmaven.test.failure.ignore clean package"
     }
  
@@ -32,10 +32,13 @@ git 'https://github.com/dstar55/docker-hello-world-spring-boot.git'
  
     stage('Build Docker Image') {
         echo "Construyendo imagen Docker..."
-        sh "mv ./target/hello*.jar ./data"  // Mueve el jar al contexto del Dockerfile
-	script {
-		dockerImage = docker.build("${dockerImageName}")
-	}
+        // Asegúrate de que la carpeta "data" exista o Dockerfile apunte bien
+        sh "mkdir -p data"
+        sh "mv ./target/hello*.jar ./data"
+ 
+        docker.withServer('unix:///var/run/docker.sock') {
+dockerImage = docker.build(dockerImageName)
+        }
     }
  
     stage('Deploy Docker Image') {
