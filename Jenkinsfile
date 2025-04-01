@@ -9,8 +9,18 @@ node {
  
     def dockerImage
  
-    stage('Clone Repo') {
-	git 'https://github.com/stevenjose/docker-hello-world-spring-boot.git'
+    stage('Build Docker Image') {
+        echo "Construyendo imagen Docker..."
+
+        sh '''
+            mkdir -p data
+            rm -f data/*.jar
+            cp ./target/hello*.jar ./data/app.jar
+        '''
+
+        docker.withServer('unix:///var/run/docker.sock') {
+            dockerImage = docker.build(dockerImageName)
+        }
     }
  
     stage('Build Project') {
