@@ -40,7 +40,7 @@ git 'https://github.com/dstar55/docker-hello-world-spring-boot.git'
  
     stage('Deploy Docker Image') {
         echo "Docker Image Tag: ${dockerImageTag}"
-        sh "docker login -u admin -p admin123 ${dockerRepoUrl}"
+        sh "docker login -u admin -p 123456 ${dockerRepoUrl}"
         sh "docker tag ${dockerImageName} ${dockerImageTag}"
         sh "docker push ${dockerImageTag}"
         sh "docker logout ${dockerRepoUrl}"
