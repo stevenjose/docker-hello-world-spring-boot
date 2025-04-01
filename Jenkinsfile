@@ -33,7 +33,9 @@ git 'https://github.com/dstar55/docker-hello-world-spring-boot.git'
     stage('Build Docker Image') {
         echo "Construyendo imagen Docker..."
         sh "mv ./target/hello*.jar ./data"  // Mueve el jar al contexto del Dockerfile
-	dockerImage = docker.build("${dockerImageName}")
+	script {
+		dockerImage = docker.build("${dockerImageName}")
+	}
     }
  
     stage('Deploy Docker Image') {
